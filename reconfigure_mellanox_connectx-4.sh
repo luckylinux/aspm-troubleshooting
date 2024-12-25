@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Some useful Notes: https://gist.github.com/kernkraft235/1d82c148368fbbd17bdd620f9c3b821c
+# Some useful Notes:
+# - https://gist.github.com/kernkraft235/1d82c148368fbbd17bdd620f9c3b821c
+# - https://forums.servethehome.com/index.php?threads/sfp-cards-with-aspm-support.36817/page-2
 
 # Define PCIe Address
 pcieaddress=${1-""}

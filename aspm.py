@@ -12,8 +12,10 @@ class ASPM(Enum):
     ASPM_L1_ONLY =    0b10
     ASPM_L1_AND_L0s = 0b11
 
-root_complex = "00:1c.4"
-endpoint = "05:00.0"
+# Original Implementation (Static & Global Variable)
+# root_complex = "00:1c.4"
+# endpoint = "05:00.0"
+
 value_to_set = ASPM.ASPM_L1_AND_L0s
 
 def get_device_name(addr):
@@ -79,7 +81,7 @@ def patch_device(addr):
 
     if int(endpoint_bytes[byte_position_to_patch]) & 0b11 != value_to_set.value:
         print("Value doesn't match the one we want, setting it!")
-        
+
         patched_byte = int(endpoint_bytes[byte_position_to_patch])
         patched_byte = patched_byte >> 2
         patched_byte = patched_byte << 2
@@ -93,8 +95,21 @@ def patch_device(addr):
         print("Nothing to patch!")
 
 def main():
-    patch_device(root_complex)
-    patch_device(endpoint)
+    # Configure Command Line Argument Parser using Argparse
+    parser = argparse.ArgumentParser(description='Configure ASPM for PCIe Device.')
+
+    parser.add_argument('-r', '--root', dest='root', required=True,
+                    help='Root Complex (PCIe Root Port) to force ASPM Status')
+
+    parser.add_argument('-d', '--device', dest='device', required=True,
+                    help='End Device (PCIe Card) to force ASPM Status')
+
+    # Parse Arguments
+    args = parser.parse_args()
+
+    # Patch Device
+    patch_device(args.root)
+    patch_device(args.device)
 
 
 if __name__ == "__main__":

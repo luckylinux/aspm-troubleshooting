@@ -228,6 +228,99 @@ And to top it Off `dmesg` states that the Hailo-8L forces the System to Disable 
 [   22.197088] hailo 0000:08:00.0: Successfully disabled ASPM L0s 
 ```
 
+I can try to Patch it using the Customized Python Script, so that I can directly feed in Command Line Arguments.
+To find the Root Port, either use `lspci -t` or, maybe easier, jusdt look at `find /sys -iwholename *08:00.0*` which will return something like this:
+```
+/sys/kernel/iommu_groups/16/devices/0000:08:00.0
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/uevent
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/resource0_wc
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power_state
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/broken_parity_status
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/subsystem_device
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/dma_mask_bits
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/vendor
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/iommu_group
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/local_cpus
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/firmware_node
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/runtime_active_time
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/wakeup
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/wakeup_count
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/wakeup_abort_count
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/wakeup_expire_count
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/runtime_active_kids
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/wakeup_total_time_ms
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/wakeup_active_count
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/runtime_usage
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/runtime_status
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/autosuspend_delay_ms
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/async
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/runtime_suspended_time
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/wakeup_max_time_ms
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/wakeup_active
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/runtime_enabled
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/control
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/power/wakeup_last_time_ms
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/class
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/reset
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/numa_node
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/resource
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/rescan
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/max_link_width
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/resource2_wc
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/msi_bus
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/device
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/aer_dev_nonfatal
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/current_link_width
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/driver
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/max_link_speed
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/resource4
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/local_cpulist
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/driver_override
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/subsystem
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/d3cold_allowed
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/irq
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/revision
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/resource2
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/current_link_speed
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/reset_method
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/resource4_wc
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/aer_dev_correctable
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/consistent_dma_mask_bits
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/resource0
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/config
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/ari_enabled
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/msi_irqs
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/msi_irqs/42
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/remove
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/iommu
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/aer_dev_fatal
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/enable
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/link
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/link/l1_aspm
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/modalias
+/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/subsystem_vendor
+/sys/devices/virtual/iommu/dmar1/devices/0000:08:00.0
+/sys/bus/pci/devices/0000:08:00.0
+/sys/bus/pci/drivers/hailo/0000:08:00.0
+```
+
+Thus the Root Port can be Found looking at e.g. the Line `/sys/devices/pci0000:00/0000:00:1c.4/0000:08:00.0/iommu` so Device `08:00.0` corresponds to Root Port `00:1c.4`.
+
+Similarly for the Other Devices:
+- `find /sys -iwholename *02:00.0*` -> `/sys/devices/pci0000:00/0000:00:01.1/0000:02:00.0/iommu` -> Device `02:00.0` and Root Port `00:01.1`
+- `find /sys -iwholename *01:00.0*` -> `/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/iommu` -> Device `01:00.0` and Root Port `00:01.0`
+
+So it can be set with:
+```
+python3 aspm.py --device "01:00.0" --root "00:01.0"
+python3 aspm.py --device "02:00.0" --root "00:01.1"
+python3 aspm.py --device "08:00.0" --root "00:1c.4"
+```
+
+Unfortunately, that still does NOT make ASPM work :(.
+
 ## Stubborn PCIe Devices
 ### Mellanox ConnectX-4
 The Device works in PCH-connected PCIe Slot (as confirmed by other People on the Internet). However, unless you have a DMI 3.0 x4 Link and/or only want e.g. 2.5-5.0 gbps (10 gbps could also work, if SATA bandwidth is Low) NIC Bandwidth,, the Bandwidth will be severly restricted and shared with SATA Controller, other Ethernet Controllers, etc.

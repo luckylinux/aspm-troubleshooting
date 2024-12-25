@@ -126,7 +126,7 @@ For the ASUS P9D with a PCIe-to-PCI Bridge ASM1083, there is a Quirk in the Linu
 
 This is how it could look like in `dmesg`:
 ```
-
+pci 0000:04:00.0: Disabling ASPM L0s/L1
 ```
 
 This trick will **ONLY** work if you do NOT have any PCI Device in those Legacy PCI Slots.

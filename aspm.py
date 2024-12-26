@@ -97,11 +97,11 @@ def main():
     # Configure Command Line Argument Parser using Argparse
     parser = argparse.ArgumentParser(description='Configure ASPM for PCIe Device.')
 
-    parser.add_argument('-r', '--root', dest='root', required=True,
-                    help='Root Complex (PCIe Root Port) to force ASPM Status')
-
-    parser.add_argument('-d', '--device', dest='device', required=True,
+    parser.add_argument('-d', '--device', dest='device', required=False, default=None,
                     help='End Device (PCIe Card) to force ASPM Status')
+
+    parser.add_argument('-r', '--root', dest='root', required=False, default=None,
+                    help='Root Complex (PCIe Root Port) to force ASPM Status')
 
     parser.add_argument('-s', '--setting', dest='setting', required=False, default='ASPM_L1_AND_L0s',
                     choices=['ASPM_DISABLED', 'ASPM_L0s_ONLY', 'ASPM_L1_ONLY', 'ASPM_L1_AND_L0s'],
@@ -110,9 +110,13 @@ def main():
     # Parse Arguments
     args = parser.parse_args()
 
-    # Patch Device
-    patch_device(args.root, setting=ASPM[args.setting])
-    patch_device(args.device, setting=ASPM[args.setting])
+    # Patch Device (if Set)
+    if args.device is not None:
+        patch_device(args.device, setting=ASPM[args.setting])
+
+    # Patch Root Port (if Set)
+    if args.root is not None:
+        patch_device(args.root, setting=ASPM[args.setting])
 
 
 if __name__ == "__main__":

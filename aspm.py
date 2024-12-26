@@ -15,8 +15,7 @@ class ASPM(Enum):
 # Original Implementation (Static & Global Variable)
 # root_complex = "00:1c.4"
 # endpoint = "05:00.0"
-
-value_to_set = ASPM.ASPM_L1_AND_L0s
+# value_to_set = ASPM_L1_AND_L0s
 
 def get_device_name(addr):
     p = subprocess.Popen([
@@ -70,7 +69,7 @@ def patch_byte(device, position, value):
         f"{hex(position)}.B={hex(value)}"
     ]).communicate()
 
-def patch_device(addr):
+def patch_device(addr, setting=ASPM_L1_AND_L0s):
     print(get_device_name(addr))
     endpoint_bytes = read_all_bytes(addr)
     byte_position_to_patch = find_byte_to_patch(endpoint_bytes, 0x34)
@@ -79,13 +78,13 @@ def patch_device(addr):
     print(f"Byte is set to {hex(endpoint_bytes[byte_position_to_patch])}")
     print(f"-> {ASPM(int(endpoint_bytes[byte_position_to_patch]) & 0b11).name}")
 
-    if int(endpoint_bytes[byte_position_to_patch]) & 0b11 != value_to_set.value:
+    if int(endpoint_bytes[byte_position_to_patch]) & 0b11 != setting.value:
         print("Value doesn't match the one we want, setting it!")
 
         patched_byte = int(endpoint_bytes[byte_position_to_patch])
         patched_byte = patched_byte >> 2
         patched_byte = patched_byte << 2
-        patched_byte = patched_byte | value_to_set.value
+        patched_byte = patched_byte | setting.value
 
         patch_byte(addr, byte_position_to_patch, patched_byte)
         new_bytes = read_all_bytes(addr)
@@ -104,12 +103,15 @@ def main():
     parser.add_argument('-d', '--device', dest='device', required=True,
                     help='End Device (PCIe Card) to force ASPM Status')
 
+    parser.add_argument('-s', '--setting', dest='setting', required=False, default='ASPM_L1_AND_L0s', choices=['ASPM_DISABLED', 'ASPM_L0s_ONLY', 'ASPM_L1_ONLY', 'ASPM_L1_AND_L0s']
+                    help='Setting for ASPM [ASPM_DISABLED,ASPM_L0s_ONLY,ASPM_L1_ONLY,ASPM_L1_AND_L0s]'
+
     # Parse Arguments
     args = parser.parse_args()
 
     # Patch Device
-    patch_device(args.root)
-    patch_device(args.device)
+    patch_device(args.root, setting=ASPM[args.setting])
+    patch_device(args.device, setting=ASPM[args.setting])
 
 
 if __name__ == "__main__":

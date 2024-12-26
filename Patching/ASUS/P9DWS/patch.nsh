@@ -31,7 +31,7 @@ setup_var.efi Setup(0x1):0x8E=1
 setup_var.efi Setup(0x1):0x8F=1
 
 # PCIe-USB Glitch W/A
-setup_var.efi Setup(0x1):0x90=1
+setup_var.efi Setup(0x1):0x90=0
 
 # PCIE Root Port Function Swapping
 setup_var.efi Setup(0x1):0x92=1

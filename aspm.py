@@ -4,8 +4,12 @@
 # Automatic Patching and Requirements Check by notthebee: https://github.com/notthebee/AutoASPM
 # Command-Line Arguments and possible future Features by luckylinux: https://github.com/luckylinux/aspm-troubleshooting
 
+# Import Core Libraries
 import subprocess
 from enum import Enum
+import platform
+import os
+import re
 
 # Parse Arguments from Command Line
 import argparse
@@ -20,6 +24,9 @@ class ASPM(Enum):
 # root_complex = "00:1c.4"
 # endpoint = "05:00.0"
 # value_to_set = ASPM_L1_AND_L0s
+
+# Debug Setting
+DEBUG=True
 
 def run_prerequisites():
     if platform.system() != "Linux":
@@ -90,9 +97,10 @@ def patch_device(addr, aspm_setting=ASPM['ASPM_L1_AND_L0s']):
     endpoint_bytes = read_all_bytes(addr)
     byte_position_to_patch = find_byte_to_patch(endpoint_bytes, 0x34)
 
-    print(f"Position of byte to patch: {hex(byte_position_to_patch)}")
-    print(f"Byte is set to {hex(endpoint_bytes[byte_position_to_patch])}")
-    print(f"-> {ASPM(int(endpoint_bytes[byte_position_to_patch]) & 0b11).name}")
+    if DEBUG:
+        print(f"Position of byte to patch: {hex(byte_position_to_patch)}")
+        print(f"Byte is set to {hex(endpoint_bytes[byte_position_to_patch])}")
+        print(f"-> {ASPM(int(endpoint_bytes[byte_position_to_patch]) & 0b11).name}")
 
     if int(endpoint_bytes[byte_position_to_patch]) & 0b11 != aspm_setting.value:
         print("Value doesn't match the one we want, setting it!")
@@ -118,11 +126,37 @@ def list_supported_devices() -> dict:
     aspm_devices = {}
     for dev in lspci_arr:
         device_addr = re.findall(pcie_addr_regex, dev)[0]
+
+        # Echo
+        print(f"Processing Device {device_addr}")
+
         if "ASPM" not in dev or "ASPM not supported" in dev:
             continue
         aspm_support = re.findall(r"ASPM (L[L0-1s ]*),", dev)
         if aspm_support:
-            aspm_devices.update({device_addr: ASPM[aspm_support[0].replace(" ", "")]})
+            # Remove Spaces
+            aspm_supported_mode = aspm_support[0].replace(" ", "")
+
+            # Echo
+            print(f"\tASPM Support: {aspm_support}")
+            print(f"\tASPM Supported Modes: {aspm_supported_mode}")
+
+            # Map to ENUM
+            match aspm_supported_mode:
+                case 'L0sL1':
+                    keyname='ASPM_L1_AND_L0s'
+                case 'L0s':
+                    keyname='ASPM_L0s_ONLY'
+                case 'L1':
+                    keyname='ASPM_L1_ONLY'
+                case 'DISABLED':
+                    keyname='ASPM_DISABLED'
+                case _:
+                    keyname='ASPM_DISABLED'
+
+            aspm_devices.update({device_addr: ASPM[keyname]})
+        else:
+           print(f"\tNo ASPM Support Information Found")
     return aspm_devices
 
 def main():
@@ -159,7 +193,7 @@ def main():
     # Patch Automatically (if Enabled)
     if args.auto is True:
         for device, aspm_mode in list_supported_devices().items():
-        patch_device(device, aspm_mode)
+            patch_device(device, aspm_mode)
 
 if __name__ == "__main__":
     main()

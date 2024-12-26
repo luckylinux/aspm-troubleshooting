@@ -106,7 +106,9 @@ In my Case I was getting this Message with an **Intel i350-T4** 4x1gbps NIC.
 ### Forcefully Remove / Disable PCIe Device
 For instance you might want to "Kick Out" of the PCIe BUS a Device that Explicitely does NOT support ASPM.
 
-**Make sure that is the only device that is on the PCIe BUS and that no other Device shares the same Root Port !!**
+**IMPORTANT**:
+- Make sure that is the only device that is on the PCIe BUS and that no other Device shares the same Root Port !!
+- Removing a PCIe Device and/or PCIe Root Port can actually make the situation WORSE (e.g. Package might go from PC3 to PC2 or even PC0 !!!)
 
 For instance, on my ASUS P9D WS:
 ```

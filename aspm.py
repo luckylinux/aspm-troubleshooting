@@ -1,4 +1,8 @@
-# Original Source: https://github.com/0x666690/ASPM
+
+# Original BASH script by Luis R. Rodriguez: https://github.com/notthebee/AutoASPM
+# Re-written in Python by Z8: https://github.com/0x666690/ASPM
+# Automatic Patching and Requirements Check by notthebee: https://github.com/notthebee/AutoASPM
+# Command-Line Arguments and possible future Features by luckylinux: https://github.com/luckylinux/aspm-troubleshooting
 
 import subprocess
 from enum import Enum
@@ -12,10 +16,22 @@ class ASPM(Enum):
     ASPM_L1_ONLY =    0b10
     ASPM_L1_AND_L0s = 0b11
 
-# Original Implementation (Static & Global Variable)
+# Original Implementation by Z8 (Static & Global Variable)
 # root_complex = "00:1c.4"
 # endpoint = "05:00.0"
 # value_to_set = ASPM_L1_AND_L0s
+
+def run_prerequisites():
+    if platform.system() != "Linux":
+        raise OSError("This script only runs on Linux-based systems")
+    if not os.environ.get("SUDO_UID") and os.geteuid() != 0:
+        raise PermissionError("This script needs root privileges to run")
+    lspci_detected = subprocess.run(["which", "lspci"], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+    if lspci_detected.returncode > 0:
+        raise Exception("lspci not detected. Please install pciutils")
+    lspci_detected = subprocess.run(["which", "setpci"], stdout = subprocess.DEVNULL, stderr = subprocess.DEVNULL)
+    if lspci_detected.returncode > 0:
+        raise Exception("setpci not detected. Please install pciutils")
 
 def get_device_name(addr):
     p = subprocess.Popen([
@@ -69,7 +85,7 @@ def patch_byte(device, position, value):
         f"{hex(position)}.B={hex(value)}"
     ]).communicate()
 
-def patch_device(addr, setting=ASPM['ASPM_L1_AND_L0s']):
+def patch_device(addr, aspm_setting=ASPM['ASPM_L1_AND_L0s']):
     print(get_device_name(addr))
     endpoint_bytes = read_all_bytes(addr)
     byte_position_to_patch = find_byte_to_patch(endpoint_bytes, 0x34)
@@ -78,13 +94,13 @@ def patch_device(addr, setting=ASPM['ASPM_L1_AND_L0s']):
     print(f"Byte is set to {hex(endpoint_bytes[byte_position_to_patch])}")
     print(f"-> {ASPM(int(endpoint_bytes[byte_position_to_patch]) & 0b11).name}")
 
-    if int(endpoint_bytes[byte_position_to_patch]) & 0b11 != setting.value:
+    if int(endpoint_bytes[byte_position_to_patch]) & 0b11 != aspm_setting.value:
         print("Value doesn't match the one we want, setting it!")
 
         patched_byte = int(endpoint_bytes[byte_position_to_patch])
         patched_byte = patched_byte >> 2
         patched_byte = patched_byte << 2
-        patched_byte = patched_byte | setting.value
+        patched_byte = patched_byte | aspm_setting.value
 
         patch_byte(addr, byte_position_to_patch, patched_byte)
         new_bytes = read_all_bytes(addr)
@@ -93,9 +109,31 @@ def patch_device(addr, setting=ASPM['ASPM_L1_AND_L0s']):
     else:
         print("Nothing to patch!")
 
+def list_supported_devices() -> dict:
+    pcie_addr_regex = r"([0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f])"
+    lspci = subprocess.run("lspci -vv", shell=True, capture_output=True).stdout
+    lspci_arr = re.split(pcie_addr_regex, str(lspci))[1:]
+    lspci_arr = [ x+y for x,y in zip(lspci_arr[0::2], lspci_arr[1::2]) ]
+
+    aspm_devices = {}
+    for dev in lspci_arr:
+        device_addr = re.findall(pcie_addr_regex, dev)[0]
+        if "ASPM" not in dev or "ASPM not supported" in dev:
+            continue
+        aspm_support = re.findall(r"ASPM (L[L0-1s ]*),", dev)
+        if aspm_support:
+            aspm_devices.update({device_addr: ASPM[aspm_support[0].replace(" ", "")]})
+    return aspm_devices
+
 def main():
+    # Check Prerequisites
+    run_prerequisites()
+
     # Configure Command Line Argument Parser using Argparse
     parser = argparse.ArgumentParser(description='Configure ASPM for PCIe Device.')
+
+    parser.add_argument('-a', '--auto', dest='auto', required=False, default=False, action='store_true',
+                    help='Automatically Patch all Devices to enable ASPM Status')
 
     parser.add_argument('-d', '--device', dest='device', required=False, default=None,
                     help='End Device (PCIe Card) to force ASPM Status')
@@ -118,6 +156,10 @@ def main():
     if args.root is not None:
         patch_device(args.root, setting=ASPM[args.setting])
 
+    # Patch Automatically (if Enabled)
+    if args.auto is True:
+        for device, aspm_mode in list_supported_devices().items():
+        patch_device(device, aspm_mode)
 
 if __name__ == "__main__":
     main()

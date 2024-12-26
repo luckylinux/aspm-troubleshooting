@@ -169,32 +169,32 @@ setup_var.efi Setup(0x1):0xA59=1
 
 # Package C state demotion - Enable Package C state demotion
 # 0: Disabled / 1: Enabled
-Setup(0x1):0x59=0
+setup_var.efi Setup(0x1):0x59=0
 
 # Package C state undemotion - Enable Package C state undemotion
 # 0: Disabled / 1: Enabled
-Setup(0x1):0x5A=0
+setup_var.efi Setup(0x1):0x5A=0
 
 # C1 state auto demotion - Processor will conditionally demote C3/C6/C7 requests to C1 based on uncore auto-demote information
 # 0: Disabled / 1: Enabled
-Setup(0x1):0x55=0
+setup_var.efi Setup(0x1):0x55=0
 
 # C3 state auto demotion - Processor will conditionally demote C6/C7 requests to C3 based on uncore auto-demote information
 # 0: Disabled / 1: Enabled
-Setup(0x1):0x58=0
+setup_var.efi Setup(0x1):0x58=0
 
 # C1 state auto undemotion - Un-demotion from Demoted C1
 # 0: Disabled / 1: Enabled
-Setup(0x1):0x57=0
+setup_var.efi Setup(0x1):0x57=0
 
 # C3 state auto undemotion - Un-demotion from Demoted C1
 # 0: Disabled / 1: Enabled
-Setup(0x1):0x56=0
+setup_var.efi Setup(0x1):0x56=0
 
 # C state Pre-Wake - Enable or disable C state Pre-Wake feature
 # 0: Disabled / 1: Enabled
-Setup(0x1):0x5D=0
+setup_var.efi Setup(0x1):0x5D=0
 
 # Package C State Support
 # 0: C0-C1 / 1: C2 / 2: C3 / 3: C6 / 4: CPU C7 / 5: CPU C7s / 9: Auto / Enabled: 255
-Setup(0x1):0x67=9
+setup_var.efi Setup(0x1):0x67=9

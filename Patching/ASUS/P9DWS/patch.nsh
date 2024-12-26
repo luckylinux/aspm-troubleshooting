@@ -43,11 +43,11 @@ setup_var.efi Setup(0x1):0x92=1
 
 # PCI Express Root Port 2 - Control the PCI Express Root Port
 # 0: Disabled / 1: Enabled
-Setup(0x1):0x96=0
+setup_var.efi Setup(0x1):0x96=0
 
 # PCI Express Root Port 2 - ASPM Support
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0x9E=3
+setup_var.efi Setup(0x1):0x9E=3
 
 
 
@@ -57,7 +57,7 @@ Setup(0x1):0x9E=3
 
 # PCI Express Root Port 3 - ASPM Support
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0x9F=3
+setup_var.efi Setup(0x1):0x9F=3
 
 
 
@@ -69,7 +69,7 @@ Setup(0x1):0x9F=3
 
 # PCI Express Root Port 4 - ASPM Support
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0xA0=3
+setup_var.efi Setup(0x1):0xA0=3
 
 
 
@@ -80,7 +80,7 @@ Setup(0x1):0xA0=3
 
 # PCI Express Root Port 5 - ASPM Support
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0xA1=3
+setup_var.efi Setup(0x1):0xA1=3
 
 
 
@@ -91,7 +91,7 @@ Setup(0x1):0xA1=3
 
 # PCI Express Root Port 6 - ASPM Support
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0xA2=3
+setup_var.efi Setup(0x1):0xA2=3
 
 
 
@@ -101,7 +101,7 @@ Setup(0x1):0xA2=3
 
 # PCI Express Root Port 7 - ASPM Support
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0xA3=3
+setup_var.efi Setup(0x1):0xA3=3
 
 
 
@@ -111,7 +111,7 @@ Setup(0x1):0xA3=3
 
 # PCI Express Root Port 8 - ASPM Support
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0xA4=3
+setup_var.efi Setup(0x1):0xA4=3
 
 
 
@@ -124,23 +124,23 @@ Setup(0x1):0xA4=3
 
 # Enable PEG - To enable or disable the PEG
 # 0: Auto / 1: Enabled / 2: Disabled
-Setup(0x1):0x2BE=1
+setup_var.efi Setup(0x1):0x2BE=1
 
 # DMI Link ASPM Control
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0x318=3
+setup_var.efi Setup(0x1):0x318=3
 
 # PEG - ASPM - Control ASPM support for the PEG Device - This has no effect if PEG is not the currently active device
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0x2B5=3
+setup_var.efi Setup(0x1):0x2B5=3
 
 # PEG1 - ASPM - Control ASPM support for the PEG Device - This has no effect if PEG is not the currently active device
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0x2B6=3
+setup_var.efi Setup(0x1):0x2B6=3
 
 # PEG2 - ASPM - Control ASPM support for the PEG Device - This has no effect if PEG is not the currently active device
 # 0: Disabled / 1: L0s / 2: L1 / 3: L0sL1 / 4: Auto
-Setup(0x1):0x2B7=3
+setup_var.efi Setup(0x1):0x2B7=3
 
 
 
@@ -152,8 +152,8 @@ Setup(0x1):0x2B7=3
 
 # PCI Express Native Power Management - For enhanced PCI Express power saving
 # 0: Disabled / 1: Enabled
-Setup(0x1):0xA58=1
+setup_var.efi Setup(0x1):0xA58=1
 
 # Native ASPM - On enable, Operating System will control the ASPM support for the device. If disabled, the BIOS will.
 # 0: Disabled / 1: Enabled
-Setup(0x1):0xA59=1
+setup_var.efi Setup(0x1):0xA59=1

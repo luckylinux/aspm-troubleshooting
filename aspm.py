@@ -69,7 +69,7 @@ def patch_byte(device, position, value):
         f"{hex(position)}.B={hex(value)}"
     ]).communicate()
 
-def patch_device(addr, setting=ASPM_L1_AND_L0s):
+def patch_device(addr, setting=ASPM['ASPM_L1_AND_L0s']):
     print(get_device_name(addr))
     endpoint_bytes = read_all_bytes(addr)
     byte_position_to_patch = find_byte_to_patch(endpoint_bytes, 0x34)

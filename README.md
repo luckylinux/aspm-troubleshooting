@@ -323,6 +323,12 @@ python3 aspm.py --device "08:00.0" --root "00:1c.4"
 
 Unfortunately, that still does NOT make ASPM work :(.
 
+To patch only the Root Port one can do:
+```
+python3 aspm.py --root "00:1c.0" --setting "ASPM_L1_AND_L0s"
+python3 aspm.py --root "00:1c.1" --setting "ASPM_L1_AND_L0s"
+```
+
 ## Stubborn PCIe Devices
 ### Mellanox ConnectX-4
 The Device works in PCH-connected PCIe Slot (as confirmed by other People on the Internet). However, unless you have a DMI 3.0 x4 Link and/or only want e.g. 2.5-5.0 gbps (10 gbps could also work, if SATA bandwidth is Low) NIC Bandwidth,, the Bandwidth will be severly restricted and shared with SATA Controller, other Ethernet Controllers, etc.

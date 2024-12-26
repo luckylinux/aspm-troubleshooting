@@ -184,16 +184,16 @@ def main():
 
     # Patch Device (if Set)
     if args.device is not None:
-        patch_device(args.device, setting=ASPM[args.setting])
+        patch_device(args.device, aspm_setting=ASPM[args.setting])
 
     # Patch Root Port (if Set)
     if args.root is not None:
-        patch_device(args.root, setting=ASPM[args.setting])
+        patch_device(args.root, aspm_setting=ASPM[args.setting])
 
     # Patch Automatically (if Enabled)
     if args.auto is True:
         for device, aspm_mode in list_supported_devices().items():
-            patch_device(device, aspm_mode)
+            patch_device(device, aspm_setting=aspm_mode)
 
 if __name__ == "__main__":
     main()

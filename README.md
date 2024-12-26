@@ -328,6 +328,11 @@ The Device works in PCH-connected PCIe Slot (as confirmed by other People on the
 On CPU-connected PCIe Slots however, it seems that the System just doesn't want to go into ASPM, no matter what one does. Even though `lspci` still statees (exactly like on PCH-connected PCIe Slots) that the Mellanox ConnectX-4 NIC does Support ASPM L1.
 
 For very Recent Intel 12th/13th Generation i5/i7 CPUs, the Issue might be related to PCIe "Multi-VC" (Multiple Virtual Channels), which need to be disabled in the BIOS.
+
+See for Instance:
+- [Intel Community](https://community.intel.com/t5/Embedded-Connectivity/Using-x16-pcie-slot-disables-low-package-c-states-ASPM-Alderlake/m-p/1556971#M5027)
+- [Matt Gadient Blog](https://mattgadient.com/7-watts-idle-on-intel-12th-13th-gen-the-foundation-for-building-a-low-power-server-nas/?replytocom=76320#respond) (According to  etnicor on February 15, 2024)
+
 Very often that Feature is NOT exposed in the BIOS, so one needs to build a Custom Modded BIOS and flash that onto the Board.
 
 Alternatively, one can Decompile an Existing BIOS using UEFITool + IFRExtractor, then use a Tool like [`setup_var.efi`](https://github.com/datasone/setup_var.efi) to set such Setting from a UEFI Shell.
@@ -336,13 +341,17 @@ Unfortunately, neither Option worked for me, presumably because I don't have Mul
 
 Some Users including me attempted to play with `mlxconfig` (see `reconfigure_mellanox_connectx-4.sh`) but no Success was reported thus far.
 
+See for Instance:
+- [List and Explanation of Mellanox Settings](https://gist.github.com/kernkraft235/1d82c148368fbbd17bdd620f9c3b821c)
+- [Some Attempts by User on ServeTheHome Forums](https://forums.servethehome.com/index.php?threads/sfp-cards-with-aspm-support.36817/page-2)
+
+
 Both the Cause and the Solution to this Issue still remains unknown.
 
 ## Working PCIe Devices
 The Intel X710-DA2 NIC seems to support ASPM out of the Box, both in CPU-connected PCIe Slots, as well as in PCH-connected PCIe Slots.
 
 # ASPM Script
-** !! NOT YET IMPLEMENTED !! **
 I use a modified version of the Excellent [ASPM Script](https://github.com/0x666690/ASPM) with a simple Option to feed-in the Arguments via Command Line (`argparse`).
 
 Note: based on some [Reddit](https://www.reddit.com/r/debian/comments/8c6ytj/active_state_power_management_aspm/) User Comments, the Reason why "Unkown Register" Error shows up when using a Shell Script called `aspm-enabler` is because the `bc` Package was not installed.

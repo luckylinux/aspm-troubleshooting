@@ -103,8 +103,9 @@ def main():
     parser.add_argument('-d', '--device', dest='device', required=True,
                     help='End Device (PCIe Card) to force ASPM Status')
 
-    parser.add_argument('-s', '--setting', dest='setting', required=False, default='ASPM_L1_AND_L0s', choices=['ASPM_DISABLED', 'ASPM_L0s_ONLY', 'ASPM_L1_ONLY', 'ASPM_L1_AND_L0s']
-                    help='Setting for ASPM [ASPM_DISABLED,ASPM_L0s_ONLY,ASPM_L1_ONLY,ASPM_L1_AND_L0s]'
+    parser.add_argument('-s', '--setting', dest='setting', required=False, default='ASPM_L1_AND_L0s',
+                    choices=['ASPM_DISABLED', 'ASPM_L0s_ONLY', 'ASPM_L1_ONLY', 'ASPM_L1_AND_L0s'],
+                    help='Setting for ASPM [ASPM_DISABLED,ASPM_L0s_ONLY,ASPM_L1_ONLY,ASPM_L1_AND_L0s]')
 
     # Parse Arguments
     args = parser.parse_args()

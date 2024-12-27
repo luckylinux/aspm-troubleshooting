@@ -36,8 +36,8 @@ turbostat --show Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7 --interval 0.1
 # List PCIe Devices with ASPM Disabled
 lspci -vvv | grep --color -B40 -A40 -i "ASPM Disabled"
 
-
-
+# Query Status in General
+lspci -vv | awk '/ASPM/{print $0}' RS= | grep --color -P '(^[a-z0-9:.]+|ASPM )'
 
 # According to Intel, PCIe Multi-VC ("Multiple Virtual Channel") can cause the Package to be stuck at PC3 instead of PC10, in case the PCIe Device is installed in a CPU-controlled PCIe Slot
 # References:

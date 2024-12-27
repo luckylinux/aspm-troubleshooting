@@ -345,7 +345,7 @@ See for Instance:
 
 Very often that Feature is NOT exposed in the BIOS, so one needs to build a Custom Modded BIOS and flash that onto the Board.
 
-Alternatively, one can Decompile an Existing BIOS using UEFITool + IFRExtractor, then use a Tool like [`setup_var.efi`](https://github.com/datasone/setup_var.efi) to set such Setting from a UEFI Shell.
+Alternatively, one can Decompile an Existing BIOS using UEFITool + IFRExtractor, then use a Tool like [`setup_var.efi`](https://github.com/datasone/setup_var.efi) or possibly [`uvt` / `UefiVarTool`](https://github.com/GeographicCone/UefiVarTool) to set such Setting from a UEFI Shell.
 
 Unfortunately, neither Option worked for me, presumably because I don't have Multi-VC to beging with on older Platforms such as Intel Xeon E3 v3 and possibly also v5/v6 (I didn't test those yet).
 
@@ -423,7 +423,7 @@ The easiest (by far) Way to Patch BIOS Settings is as Follows:
     -  `./efi/boot/bootx64.efi`
     -  `./shellx64.efi`
     -  `./bootx64.efi`
-- Get `setup_var.efi` from the [Official Repository](https://github.com/datasone/setup_var.efi)
+- Get `setup_var.efi` from the [Official Repository](https://github.com/datasone/setup_var.efi). Alternatively get `uvt` / `UefiVarTool` from their [Official Repository](https://github.com/GeographicCone/UefiVarTool)
 - (Optional) Write your EFI Shell Script e.g. `patch.nsh` to automate all Operations from UEFI Shell:
 ```
 # Tested with BIOS Version <BIOS_Version> on <Manufactorer> <Motherboard_Model>

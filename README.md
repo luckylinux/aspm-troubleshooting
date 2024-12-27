@@ -474,8 +474,25 @@ Once the Preparations are Done:
 - Execute the Script by issueing `patch.nsh`
 - Reboot the System by issueing `reset`
 
+# Useful Tools
+## Basic Troubleshooting
+- `cpupower`
+- `turbostat`
+
+## Interrupts Analysis
+- `vmstat`
+- `procinfo`
+
+# Useful Readings
+- https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/performance_tuning_guide/sect-red_hat_enterprise_linux-performance_tuning_guide-cpu-monitoring_and_diagnosing_performance_problems#sect-Red_Hat_Enterprise_Linux-Performance_Tuning_Guide-Monitoring_and_diagnosing_performance_problems-numastat
+- https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/8/html-single/monitoring_and_managing_system_status_and_performance/index#overview-of-performance-monitoring-options_monitoring-and-managing-system-status-and-performance
+- https://www.site24x7.com/learn/linux/context-switching.html
+- https://www.suse.com/support/kb/doc/?id=000016914
+
 # References
 - https://github.com/luckylinux/acpi-linux-patching
 - https://z8.re/blog/aspm.html
 - https://z8.re/blog/aspm-part-2.html
 - https://github.com/0x666690
+
+

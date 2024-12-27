@@ -425,7 +425,7 @@ The easiest (by far) Way to Patch BIOS Settings is as Follows:
     -  `./bootx64.efi`
 - Get `setup_var.efi` from the [Official Repository](https://github.com/datasone/setup_var.efi)
 - (Optional) Write your EFI Shell Script e.g. `patch.nsh` to automate all Operations from UEFI Shell:
-  ```
+```
 # Tested with BIOS Version <BIOS_Version> on <Manufactorer> <Motherboard_Model>
 
 # Disable printing of Commands

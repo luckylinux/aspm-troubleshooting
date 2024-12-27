@@ -465,6 +465,15 @@ grep -rih "<Your_Search_Criteria>" *.txt | grep "VarOffset" | sed -E "s|.*?VarSt
 
 Then of course you'll have to manually scan the Files by the correct `VarOffset` to determine which Value you want to use.
 
+Once the Preparations are Done:
+- Boot the System
+- Either Choose "Select Boot Device" (Typically F10 or F11 on Supermicro Motherboards) or "Enter BIOS Setup" (Typically F2/DELETE)
+- Choose your USB FlashDrive
+- Enter the FlashDrive Root Folder. This is typically done by entering `fs0:`
+- Change Folder where you put your `patch.nsh` UEFI Script and the `setup_var.efi` Executable
+- Execute the Script by issueing `patch.nsh`
+- Reboot the System by issueing `reset`
+
 # References
 - https://github.com/luckylinux/acpi-linux-patching
 - https://z8.re/blog/aspm.html

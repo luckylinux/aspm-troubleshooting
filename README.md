@@ -367,6 +367,7 @@ I use a modified version of the Excellent [ASPM Script](https://github.com/0x666
 Note: based on some [Reddit](https://www.reddit.com/r/debian/comments/8c6ytj/active_state_power_management_aspm/) User Comments, the Reason why "Unkown Register" Error shows up when using a Shell Script called `aspm-enabler` is because the `bc` Package was not installed.
 
 # Patching BIOS Settings
+## Using UEFITool
 This Example Supposes the Following Folder Structure and shows the Process of Analysing a Supermicro X10SLM+-F BIOS Version 3.3, although of course other Folder Structures can be used of course:
 ```
 .
@@ -476,6 +477,31 @@ Once the Preparations are Done:
 - Change Folder where you put your `patch.nsh` UEFI Script and the `setup_var.efi` Executable
 - Execute the Script by issueing `patch.nsh`
 - Reboot the System by issueing `reset`
+
+# Using ufk - **NOT** WORKING YET
+**WORK IN PROGRESS - CURRENTLY THIS DOES __NOT__ WORK**
+
+It's also possible to use [`ufk`](https://github.com/linuxboot/fiano) to get the Required Information.
+
+Extract Information using `ufk` and Export into JSON Format:
+```
+utk ./x10slh0.327 json > x10slh0.327.json
+```
+
+Then extract the GUID like e.g.
+```
+GUID=$(cat x10slh0.327.json | jq  '.. | objects | select(.Name=="Setup"?) | .GUID.GUID')
+```
+
+Locate the File to be Analysed:
+```
+FILENAME=$(find x10slh0.327.utk.extract/ -iwholename *EC87D643-EBA4-4BB5-A1E5-3F3E36B20DA9/Setup.bin)
+```
+
+Extract the Information with `ifrextractor`:
+```
+ifrextractor 
+```
 
 # Useful Tools
 ## Basic Troubleshooting

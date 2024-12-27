@@ -449,6 +449,9 @@ setup_var.efi <Name>(<VarStoreId>):<VarOffset>=<Value>
 # ...
 ```
 
+You can refer to some Actualy Files (some totally/partially NOT Tested !) in the `patching` Subfolder.
+
+
 **USUALLY** (for **MOST** Settings):
 - `<VarStoreId>` is `0x1`
 - `<Name>` is `Setup`

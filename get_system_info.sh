@@ -21,20 +21,8 @@ grep . /sys/devices/system/cpu/cpu*/cpuidle/state**/*
 # Get CPUIdle Information
 grep . /sys/devices/system/cpu/cpuidle/*
 
-# Display Statistics using turbostat every 0.5 Seconds
-turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7 --interval 0.5
-
-# Display Statistics using turbostat every 0.5 Seconds
-turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7,IPC,IRQ,SMI --interval 0.5
-
-# Only show the most Important Parts related to Package C-States (PC-States)
-turbostat --show Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7 --interval 0.1
-
-# Display Statistics using turbostat every 0.5 Seconds
-# turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7,PkgWatt,CorWatt,IPC,IRQ,SMI --interval 0.5
-
-# List PCIe Devices with ASPM Disabled
-lspci -vvv | grep --color -B40 -A40 -i "ASPM Disabled"
+# List PCIe Devices with ASPM Disabled or Unlimited Exit Latency
+lspci -vvv | grep -A60 -B60 --color -Ei "ASPM\sDisabled|L1 Unlimited|L0 Unlimited"
 
 # Query Status in General
 lspci -vv | awk '/ASPM/{print $0}' RS= | grep --color -P '(^[a-z0-9:.]+|ASPM )'
@@ -47,3 +35,15 @@ lspci -vv | awk '/ASPM/{print $0}' RS= | grep --color -P '(^[a-z0-9:.]+|ASPM )'
 lspci -vvv | grep -B60 -A60 --color -i "Virtual Channel"
 
 # It seems to be only/mostly an Issue on the X16 PCIe Slot though
+
+# Display Statistics using turbostat every 0.5 Seconds
+# turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7 --interval 0.5
+
+# Display Statistics using turbostat every 0.5 Seconds
+# turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7,IPC,IRQ,SMI --interval 0.5
+
+# Only show the most Important Parts related to Package C-States (PC-States)
+# turbostat --show Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7 --interval 0.1
+
+# Display Statistics using turbostat every 0.5 Seconds
+# turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7,PkgWatt,CorWatt,IPC,IRQ,SMI --interval 0.5

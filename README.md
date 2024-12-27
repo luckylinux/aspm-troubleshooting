@@ -4,6 +4,8 @@ aspm-troubleshooting
 # Introduction
 This Repository provides an Overview with some Tips/Tricks into getting ASPM to Work in some/many/most Circumstances.
 
+**WARNING**: I'm not responsible for any breakages of BIOS, Motherboards, CPUs, or whatever else. Proceed at your own Risk and do your own Research & Investigation.
+
 # Getting ASPM to work
 There are several Steps involved in getting ASPM to work.
 
@@ -363,6 +365,105 @@ The Intel X710-DA2 NIC seems to support ASPM out of the Box, both in CPU-connect
 I use a modified version of the Excellent [ASPM Script](https://github.com/0x666690/ASPM) with a simple Option to feed-in the Arguments via Command Line (`argparse`).
 
 Note: based on some [Reddit](https://www.reddit.com/r/debian/comments/8c6ytj/active_state_power_management_aspm/) User Comments, the Reason why "Unkown Register" Error shows up when using a Shell Script called `aspm-enabler` is because the `bc` Package was not installed.
+
+# Patching BIOS Settings
+This Example Supposes the Following Folder Structure and shows the Process of Analysing a Supermicro X10SLM+-F BIOS Version 3.3, although of course other Folder Structures can be used of course:
+```
+.
+├── ifrextractor
+│   ├── ifrextractor
+│   ├── Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin
+│   ├── Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin.0.0.en-US.ifr.txt
+│   ├── Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin.1.0.en-US.ifr.txt
+│   ├── Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin.2.0.en-US.ifr.txt
+│   ├── Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin.3.0.en-US.ifr.txt
+│   ├── Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin.4.0.en-US.ifr.txt
+│   └── Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin.5.0.en-US.ifr.txt
+├── UEFITool
+│   ├── Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin
+│   ├── uefitool
+│   └── x10slh0.327
+└── x10slh0.327
+
+```
+
+The easiest (by far) Way to Patch BIOS Settings is as Follows:
+- Download your BIOS Firmware from the Manufacturer, making sure to select the correct Motherboard Model and BIOS Version
+- `uefitool`
+  - Download the Tool from the [Official Repository](https://github.com/LongSoft/UEFITool/releases)
+  - Open the Tool: `./UEFITool/uefitool`
+  - "File" -> "Open Image File"
+  - File Type: "All Files"
+  - Select your BIOS Image
+  - Click "Open"
+  - "Action" -> "Search"
+  - Go to "Text" Tab
+  - Enter "Setup"
+  - Click "OK"
+  - Click on one of the Results that States `Unicode text "Setup" found in Setup/.../MiniSetupResourceSection at header-offset 2E3EBh"`
+  - Select the Item `MiniSetupResourceSection` which should be located under  `Setup/Compressed Section/MiniSetupResourceSection`
+  - Right Click -> Extract Body -> Save this File in the same Folder as `uefitool`
+- `ifrextractor`
+  - Download the Tool from the [Official Repository](https://github.com/LongSoft/IFRExtractor-RS)
+  - Suggest to copy the File saved from `uefitool` into the ifrextractor Folder
+  - Switch Folder to the Tool Executable: `cd ./ifrextractor`
+  - Run `ifrextractor` to Extract the BIOS Data as Text: `./ifrextractor Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin`
+  - A lot of `.txt` Files will be Generated, each of which (`0.0`, `1.0`, ...) should correspond to a different Tab in the BIOS Screen
+- Prepare a UEFI Boot Drive
+  - (Many Things might NOT be required, but this was the only way I could get it to boot on an ASUS P9D WS Motherboard with the "Standard" EFI Shell Executable Layout)
+  - Format the Drive as FAT32
+  - Get a `shellx64.efi` UEFI Shell Executable 
+    - (Old) [TianoCore](https://github.com/tianocore/edk2/blob/UDK2018/ShellBinPkg/UefiShell/X64/Shell.efi)
+    - (Verify Build Process / Artifacts for Safety) [pbatard Repository](https://github.com/pbatard/UEFI-Shell/releases/download/24H2/shellx64.efi)
+  - Create a `./efi/boot` Folder Structure in your newly formatted FAT32 Drive
+  - Copy `shellx64.efi` to:
+    -  `./efi/shellx64.efi`
+    -  `./efi/bootx64.efi`
+    -  `./efi/boot/shellx64.efi`
+    -  `./efi/boot/bootx64.efi`
+    -  `./shellx64.efi`
+    -  `./bootx64.efi`
+- Get `setup_var.efi` from the [Official Repository](https://github.com/datasone/setup_var.efi)
+- (Optional) Write your EFI Shell Script e.g. `patch.nsh` to automate all Operations from UEFI Shell:
+  ```
+# Tested with BIOS Version <BIOS_Version> on <Manufactorer> <Motherboard_Model>
+
+# Disable printing of Commands
+@echo -off
+
+
+#############################################
+# <Section_Name>                            #
+#############################################
+
+# <Menu_Title> - <Help_Text>
+# <Value_0>: <Meaning_0> / <Value_1>: <Meaning_1> / ...
+setup_var.efi <Name>(<VarStoreId>):<VarOffset>=<Value>
+
+# <Menu_Title> - <Help_Text>
+# <Value_0>: <Meaning_0> / <Value_1>: <Meaning_1> / ...
+setup_var.efi <Name>(<VarStoreId>):<VarOffset>=<Value>
+
+# ...
+# ...
+# ...
+```
+
+**USUALLY** (for **MOST** Settings):
+- `<VarStoreId>` is `0x1`
+- `<Name>` is `Setup`
+
+However, to make Sure, since `<Name>` is usually Defined in the First File, so you can Find `<Name>` by doing:
+```
+grep -ri "VarStoreId: <VarStoreId>," Section_Freeform_*.0.0* | sed -E "s|.*, Name: \"([a-zA-Z0-9]*?)\"|\1|"
+```
+
+To search for settings you might be Interested in, you can e.g. do to pre-generate a list of Fields to be manually adressed:
+```
+grep -rih "<Your_Search_Criteria>" *.txt | grep "VarOffset" | sed -E "s|.*?VarStoreId: 0x([0-9A-F]+?), VarOffset: 0x([0-9A-F]+?),.*|setup_var.efi Setup(0x\1)\:0x\2=<To_Be_Manually_Filled_In>|" | uniq
+```
+
+Then of course you'll have to manually scan the Files by the correct `VarOffset` to determine which Value you want to use.
 
 # References
 - https://github.com/luckylinux/acpi-linux-patching

@@ -367,7 +367,8 @@ I use a modified version of the Excellent [ASPM Script](https://github.com/0x666
 Note: based on some [Reddit](https://www.reddit.com/r/debian/comments/8c6ytj/active_state_power_management_aspm/) User Comments, the Reason why "Unkown Register" Error shows up when using a Shell Script called `aspm-enabler` is because the `bc` Package was not installed.
 
 # Patching BIOS Settings
-## Using UEFITool
+## Using UEFITool + ifrextractor + setup_var.efi
+### Introduction
 This Example Supposes the Following Folder Structure and shows the Process of Analysing a Supermicro X10SLM+-F BIOS Version 3.3, although of course other Folder Structures can be used of course:
 ```
 .
@@ -385,73 +386,37 @@ This Example Supposes the Following Folder Structure and shows the Process of An
 │   ├── uefitool
 │   └── x10slh0.327
 └── x10slh0.327
-
 ```
 
-The easiest (by far) Way to Patch BIOS Settings is as Follows:
-- Download your BIOS Firmware from the Manufacturer, making sure to select the correct Motherboard Model and BIOS Version
-- `uefitool`
-  - Download the Tool from the [Official Repository](https://github.com/LongSoft/UEFITool/releases)
-  - Open the Tool: `./UEFITool/uefitool`
-  - "File" -> "Open Image File"
-  - File Type: "All Files"
-  - Select your BIOS Image
-  - Click "Open"
-  - "Action" -> "Search"
-  - Go to "Text" Tab
-  - Enter "Setup"
-  - Click "OK"
-  - Click on one of the Results that States `Unicode text "Setup" found in Setup/.../MiniSetupResourceSection at header-offset 2E3EBh"`
-  - Select the Item `MiniSetupResourceSection` which should be located under  `Setup/Compressed Section/MiniSetupResourceSection`
-  - Right Click -> Extract Body -> Save this File in the same Folder as `uefitool`
-- `ifrextractor`
-  - Download the Tool from the [Official Repository](https://github.com/LongSoft/IFRExtractor-RS)
-  - Suggest to copy the File saved from `uefitool` into the ifrextractor Folder
-  - Switch Folder to the Tool Executable: `cd ./ifrextractor`
-  - Run `ifrextractor` to Extract the BIOS Data as Text: `./ifrextractor Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin`
-  - A lot of `.txt` Files will be Generated, each of which (`0.0`, `1.0`, ...) should correspond to a different Tab in the BIOS Screen
-- Prepare a UEFI Boot Drive
-  - (Many Things might NOT be required, but this was the only way I could get it to boot on an ASUS P9D WS Motherboard with the "Standard" EFI Shell Executable Layout)
-  - Format the Drive as FAT32
-  - Get a `shellx64.efi` UEFI Shell Executable 
-    - (Old) [TianoCore](https://github.com/tianocore/edk2/blob/UDK2018/ShellBinPkg/UefiShell/X64/Shell.efi)
-    - (Verify Build Process / Artifacts for Safety) [pbatard Repository](https://github.com/pbatard/UEFI-Shell/releases/download/24H2/shellx64.efi)
-  - Create a `./efi/boot` Folder Structure in your newly formatted FAT32 Drive
-  - Copy `shellx64.efi` to:
-    -  `./efi/shellx64.efi`
-    -  `./efi/bootx64.efi`
-    -  `./efi/boot/shellx64.efi`
-    -  `./efi/boot/bootx64.efi`
-    -  `./shellx64.efi`
-    -  `./bootx64.efi`
-- Get `setup_var.efi` from the [Official Repository](https://github.com/datasone/setup_var.efi). Alternatively get `uvt` / `UefiVarTool` from their [Official Repository](https://github.com/GeographicCone/UefiVarTool)
-- (Optional) Write your EFI Shell Script e.g. `patch.nsh` to automate all Operations from UEFI Shell:
-```
-# Tested with BIOS Version <BIOS_Version> on <Manufactorer> <Motherboard_Model>
+The easiest (by far) Way to Patch BIOS Settings is as the following Section Describes.
 
-# Disable printing of Commands
-@echo -off
+### Get the Original BIOS
+Download your BIOS Firmware from the Manufacturer, making sure to select the correct Motherboard Model and BIOS Version
+
+### `uefitool`
+- Download the Tool from the [Official Repository](https://github.com/LongSoft/UEFITool/releases)
+- Open the Tool: `./UEFITool/uefitool`
+- "File" -> "Open Image File"
+- File Type: "All Files"
+- Select your BIOS Image
+- Click "Open"
+- "Action" -> "Search"
+- Go to "Text" Tab
+- Enter "Setup"
+- Click "OK"
+- Click on one of the Results that States `Unicode text "Setup" found in Setup/.../MiniSetupResourceSection at header-offset 2E3EBh"`
+- Select the Item `MiniSetupResourceSection` which should be located under  `Setup/Compressed Section/MiniSetupResourceSection`
+- Right Click -> Extract Body -> Save this File in the same Folder as `uefitool`
+
+### `ifrextractor`
+- Download the Tool from the [Official Repository](https://github.com/LongSoft/IFRExtractor-RS)
+- Suggest to copy the File saved from `uefitool` into the ifrextractor Folder
+- Switch Folder to the Tool Executable: `cd ./ifrextractor`
+- Run `ifrextractor` to Extract the BIOS Data as Text: `./ifrextractor Section_Freeform_subtype_GUID_MiniSetupResourceSection_Setup_Setup_body.bin`
+- A lot of `.txt` Files will be Generated, each of which (`0.0`, `1.0`, ...) should correspond to a different Tab in the BIOS Screen
 
 
-#############################################
-# <Section_Name>                            #
-#############################################
-
-# <Menu_Title> - <Help_Text>
-# <Value_0>: <Meaning_0> / <Value_1>: <Meaning_1> / ...
-setup_var.efi <Name>(<VarStoreId>):<VarOffset>=<Value>
-
-# <Menu_Title> - <Help_Text>
-# <Value_0>: <Meaning_0> / <Value_1>: <Meaning_1> / ...
-setup_var.efi <Name>(<VarStoreId>):<VarOffset>=<Value>
-
-# ...
-# ...
-# ...
-```
-
-You can refer to some Actualy Files (some totally/partially NOT Tested !) in the `patching` Subfolder.
-
+### Find the required BIOS Settings
 Each BIOS Setting is represented by a list of Parameters, e.g.:
 ```
 OneOf Prompt: "PCH SLOT4 PCI-E 2.0 X2/4 (IN X8) - ASPM", Help: "Set the ASPM Level: Force L0s - Force all links to L0s State : AUTO - BIOS auto configure : DISABLE - Disables ASPM", QuestionFlags: 0x10, QuestionId: 0x118, VarStoreId: 0x1, VarOffset: 0xBA, Flags: 0x10, Size: 8, Min: 0x0, Max: 0x0, Step: 0x0
@@ -489,14 +454,68 @@ grep -rih "<Your_Search_Criteria>" *.txt | grep "VarOffset" | sed -E "s|.*?VarSt
 
 Then of course you'll have to manually scan the Files by the correct `VarOffset` to determine which Value you want to use.
 
+### (Optional) Prepare a UEFI Boot Drive
+The UEFI Boot Drive might NOT be at all required, if your system has already a built-in UEFI Shell.
+
+Furthermore, many of the different File Copies / Locations described below might NOT be required, but this was the only way I could get it to boot on an ASUS P9D WS Motherboard with the "Standard" EFI Shell Executable Layout.
+
+- Format the Drive as FAT32
+- Get a `shellx64.efi` UEFI Shell Executable 
+  - (Old) [TianoCore](https://github.com/tianocore/edk2/blob/UDK2018/ShellBinPkg/UefiShell/X64/Shell.efi)
+  - (Verify Build Process / Artifacts for Safety) [pbatard Repository](https://github.com/pbatard/UEFI-Shell/releases/download/24H2/shellx64.efi)
+- Create a `./efi/boot` Folder Structure in your newly formatted FAT32 Drive
+- Copy `shellx64.efi` to:
+  -  `./efi/shellx64.efi`
+  -  `./efi/bootx64.efi`
+  -  `./efi/boot/shellx64.efi`
+  -  `./efi/boot/bootx64.efi`
+  -  `./shellx64.efi`
+  -  `./bootx64.efi`
 
 
+### `setup_var.efi`
+Get `setup_var.efi` from the [Official Repository](https://github.com/datasone/setup_var.efi).
+
+Alternatively you might consider getting `uvt` / `UefiVarTool` from their [Official Repository](https://github.com/GeographicCone/UefiVarTool) (untested).
+
+Copy it to the UEFI Boot Drive or any other USB Flash Drive in case your System has a built-in UEFI Shell.
+
+### (Optional) Write an EFI Shell Script
+For easier Use, Track-Record of your Modifications, ability to share with the Community, etc, you might consider writing an EFI Shell Script e.g. `patch.nsh` to automate all Operations from UEFI Shell:
+
+You can refer to some Actualy Files (some totally/partially NOT Tested !) in the `patching` Subfolder.
+
+```
+# Tested with BIOS Version <BIOS_Version> on <Manufactorer> <Motherboard_Model>
+
+# Disable printing of Commands
+@echo -off
+
+
+#############################################
+# <Section_Name>                            #
+#############################################
+
+# <Menu_Title> - <Help_Text>
+# <Value_0>: <Meaning_0> / <Value_1>: <Meaning_1> / ...
+setup_var.efi <Name>(<VarStoreId>):<VarOffset>=<Value>
+
+# <Menu_Title> - <Help_Text>
+# <Value_0>: <Meaning_0> / <Value_1>: <Meaning_1> / ...
+setup_var.efi <Name>(<VarStoreId>):<VarOffset>=<Value>
+
+# ...
+# ...
+# ...
+```
+
+### Patch the System
 Once the Preparations are Done:
 - Boot the System
 - Either Choose "Select Boot Device" (Typically F10 or F11 on Supermicro Motherboards) or "Enter BIOS Setup" (Typically F2/DELETE)
 - Choose your USB FlashDrive
 - Enter the FlashDrive Root Folder. This is typically done by entering `fs0:`
-- Change Folder where you put your `patch.nsh` UEFI Script and the `setup_var.efi` Executable
+- Change Folder where you put your `patch.nsh` EFI Script and the `setup_var.efi` Executable using e.g. `cd TOPDIR\SUBDIR\MYDIR`
 - Execute the Script by issueing `patch.nsh`
 - Reboot the System by issueing `reset`
 

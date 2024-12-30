@@ -452,6 +452,26 @@ setup_var.efi <Name>(<VarStoreId>):<VarOffset>=<Value>
 
 You can refer to some Actualy Files (some totally/partially NOT Tested !) in the `patching` Subfolder.
 
+Each BIOS Setting is represented by a list of Parameters, e.g.:
+```
+OneOf Prompt: "PCH SLOT4 PCI-E 2.0 X2/4 (IN X8) - ASPM", Help: "Set the ASPM Level: Force L0s - Force all links to L0s State : AUTO - BIOS auto configure : DISABLE - Disables ASPM", QuestionFlags: 0x10, QuestionId: 0x118, VarStoreId: 0x1, VarOffset: 0xBA, Flags: 0x10, Size: 8, Min: 0x0, Max: 0x0, Step: 0x0
+      OneOfOption Option: "Disabled" Value: 0
+      OneOfOption Option: "L0s" Value: 1
+      OneOfOption Option: "L1" Value: 2
+      OneOfOption Option: "L0sL1" Value: 3
+      OneOfOption Option: "Auto" Value: 4, Default, MfgDefault
+End
+```
+
+The Setting itself is defined by:
+- `VarOffset` (in Example: `0xBA`): in which "Position" or "Register" it's located
+- `VarStoreId` (in Example: `0x1`): in which "Register Group" it's located
+- `Value`: the possible Values that this BIOS Setting can take, in Example:
+  - `0x0` for `Disabled`
+  - `0x1` for `L0s`
+  - `0x2` for `L1`
+  - `0x3` for `L0sL1`
+  - `0x4` for `Auto`
 
 **USUALLY** (for **MOST** Settings):
 - `<VarStoreId>` is `0x1`
@@ -468,6 +488,8 @@ grep -rih "<Your_Search_Criteria>" *.txt | grep "VarOffset" | sed -E "s|.*?VarSt
 ```
 
 Then of course you'll have to manually scan the Files by the correct `VarOffset` to determine which Value you want to use.
+
+
 
 Once the Preparations are Done:
 - Boot the System

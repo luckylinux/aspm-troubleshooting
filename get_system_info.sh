@@ -49,3 +49,8 @@ turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,
 
 # Display Statistics using turbostat every 0.5 Seconds
 # turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7,PkgWatt,CorWatt,IPC,IRQ,SMI --interval 0.5
+
+
+# Check PCIe Device Power State
+find /sys/ -iwholename */power_state | xargs -n1 -I{} | grep -h {}
+find /sys/ -iwholename */power_state | xargs -i sh -c "echo '{}'; cat {}"

@@ -52,5 +52,8 @@ turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,
 
 
 # Check PCIe Device Power State
+# https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/device-power-states
+# https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/device-sleeping-states
+# https://docs.kernel.org/power/pci.html
 find /sys/ -iwholename */power_state | xargs -n1 -I{} | grep -h {}
 find /sys/ -iwholename */power_state | xargs -i sh -c "echo '{}'; cat {}"

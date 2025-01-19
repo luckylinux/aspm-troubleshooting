@@ -36,7 +36,7 @@ lspci -vv | awk '/ASPM/{print $0}' RS= | grep --color -P '(^[a-z0-9:.]+|ASPM )'
 lspci -vvv | grep -B60 -A60 --color -i "Virtual Channel"
 
 # Display Statistics using turbostat every 0.5 Seconds
-turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7,PkgWatt,CorWatt,CoreTmp --interval 0.5
+turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7,Pkg%pc8,Pkg%pc9,Pkg%pc10,PkgWatt,CorWatt,CoreTmp --interval 0.5
 
 # Display Statistics using turbostat every 0.5 Seconds
 # turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,CPU%c1,CPU%c3,CPU%c6,CPU%c7,Pkg%pc2,Pkg%pc3,Pkg%pc6,Pkg%pc7 --interval 0.5
@@ -57,3 +57,14 @@ turbostat --show Avg_MHz,Busy%,Bzy_MHz,TSC_MHz,POLL,POLL%,C1%,C1E%,C3%,C6%,C7s%,
 # https://docs.kernel.org/power/pci.html
 find /sys/ -iwholename */power_state | xargs -n1 -I{} | grep -h {}
 find /sys/ -iwholename */power_state | xargs -i sh -c "echo '{}'; cat {}"
+
+# Dump PCI Registers EXCEP CAP/ECAP
+# https://superuser.com/questions/87703/how-to-read-a-specific-pci-device-register-in-linux-from-the-cli
+# DEVICE="03:00.0"; setpci --dumpregs | gawk '{if ($2 != 0){printf("setpci -s 03:00.0 %s.%s\n",$3,$2);system("setpci -s 03:00.0 " $3"."$2)}}'
+
+# For CAP/ECAP it's a bit different
+# setpci -v -s 03:00.0 ECAP_AER+0.w
+
+# Might be of interest: https://github.com/joseljim/PCIe_Print_PCI_Header
+
+# Useful Tutorial: https://adaptivesupport.amd.com/s/article/1148199?language=en_US
